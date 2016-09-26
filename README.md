@@ -29,3 +29,4 @@ Just take a look at `example/example.config`.
  * an install script
 * All files, including the flag will be created at /chals/$chal_name on the host and mounted in /home/user/ in the challenge VM
 * The user id of the challenge user is 427680
+* The challenge binary has to be called chal
