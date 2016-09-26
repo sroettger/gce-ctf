@@ -1,9 +1,9 @@
 # gce-ctf
-some deployment tools to run CTF challenges on github
+some deployment tools to run CTF challenges on GCE
 
 # prerequisites
 * [the google cloud sdk](https://cloud.google.com/sdk/downloads)
-* create a new project at [https://console.cloud.google.com]
+* create a new project at https://console.cloud.google.com
 * set your project id: `gcloud config set project $PROJECT_NAME`
 
 # example
