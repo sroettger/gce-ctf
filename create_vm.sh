@@ -23,4 +23,4 @@ fi
 
 echo "Creating $INSTANCE_NAME with machine type $MACHINE_TYPE"
 
-gcloud compute instances create $INSTANCE_NAME --boot-disk-size 10GB --image-family coreos-stable --image-project coreos-cloud --machine-type $MACHINE_TYPE --metadata-from-file startup-script=vm_startup.sh --zone $ZONE
+gcloud compute instances create $INSTANCE_NAME --boot-disk-size 10GB --image-family coreos-stable --image-project coreos-cloud --machine-type $MACHINE_TYPE --metadata-from-file startup-script=vm_startup.sh --zone $ZONE --no-service-account --no-scopes
