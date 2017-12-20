@@ -7,11 +7,11 @@ MACHINE_TYPE="n1-standard-2"
 ZONE="europe-west1-b"
 
 if [ $# -eq 0 ]; then
-  echo "usage: $0 VM_ID [MACHINE_TYPE] [ZONE]"
+  echo "usage: $0 INSTANCE_NAME [MACHINE_TYPE] [ZONE]"
   exit 1
 fi
 
-INSTANCE_NAME="ctf-$1"
+INSTANCE_NAME="$1"
 
 if [ $# -gt 1 ]; then
   MACHINE_TYPE=$2
