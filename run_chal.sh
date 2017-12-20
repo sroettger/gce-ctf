@@ -40,8 +40,9 @@ fi
 echo '[*] starting container'
 gcloud compute ssh $INSTANCE_NAME --command "sudo sh -c \"docker pull tsuro/nsjail-ctf && docker run -d --privileged --expose $PORT --publish $PORT:$PORT --name $CHAL_NAME --restart=always -v /chals/$CHAL_NAME:/home/user:ro tsuro/nsjail-ctf /usr/sbin/run_chal.sh $CHAL_NAME $PORT\"" --zone $ZONE
 
-echo '[*] adding instance tag'
+echo '[*] adding instance tag and label'
 gcloud compute instances add-tags $INSTANCE_NAME --tags $CHAL_NAME --zone $ZONE
+gcloud compute instances add-labels $INSTANCE_NAME --labels="$CHAL_NAME=1" --zone $ZONE
 
 echo '[*] adding firewall rule'
 FIREWALL_MSG=$(gcloud compute firewall-rules create $CHAL_NAME --allow tcp:$PORT --target-tags $CHAL_NAME 2>&1)
