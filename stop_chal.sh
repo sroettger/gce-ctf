@@ -16,5 +16,5 @@ INSTANCE_NAME=$2
 CONFIG_FILE=$3
 source $CONFIG_FILE
 
-gcloud compute ssh root@$INSTANCE_NAME --command "docker kill $CHAL_NAME; docker rm $CHAL_NAME" --zone $ZONE
+gcloud compute ssh $INSTANCE_NAME --command "sudo sh -c \"docker kill $CHAL_NAME; docker rm $CHAL_NAME\"" --zone $ZONE
 gcloud compute instances remove-tags $INSTANCE_NAME --tags $CHAL_NAME --zone $ZONE

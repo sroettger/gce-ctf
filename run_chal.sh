@@ -22,19 +22,27 @@ if [ -z $CHAL_NAME ]; then
 fi
 
 echo '[*] killing existing containers and removing files'
-gcloud compute ssh root@$INSTANCE_NAME --command "docker kill $CHAL_NAME; docker rm $CHAL_NAME; chattr -i /chals/$CHAL_NAME/*; rm -R /chals/$CHAL_NAME; mkdir -p /chals/$CHAL_NAME" --zone $ZONE
+gcloud compute ssh $INSTANCE_NAME --command "sudo sh -c \"docker kill $CHAL_NAME; docker rm $CHAL_NAME; chattr -i /chals/$CHAL_NAME/*; rm -R /chals/$CHAL_NAME; mkdir -p /chals/$CHAL_NAME\"" --zone $ZONE
+
 echo '[*] copying files'
-gcloud compute copy-files $FLAG_FILE $CHAL_FILES root@$INSTANCE_NAME:/chals/$CHAL_NAME/ --zone $ZONE
-if [ ! -z "$INSTALL_SCRIPT" ]; then
+gcloud compute ssh $INSTANCE_NAME --command "rm -R chals/$CHAL_NAME; mkdir -p chals/$CHAL_NAME" --zone $ZONE
+gcloud compute scp $FLAG_FILE $CHAL_FILES $INSTANCE_NAME:chals/$CHAL_NAME/ --zone $ZONE
+gcloud compute ssh $INSTANCE_NAME --command "sudo sh -c \"cp -R chals/$CHAL_NAME /chals/\"" --zone $ZONE
+
+if [ -f "install.sh" ]; then
   echo '[*] running install script'
-  gcloud compute ssh root@$INSTANCE_NAME --command "$INSTALL_SCRIPT" --zone $ZONE
+  gcloud compute scp install.sh $INSTANCE_NAME:chals/$CHAL_NAME/install.sh --zone $ZONE
+  gcloud compute ssh $INSTANCE_NAME --command "chmod u+x ~/chals/$CHAL_NAME/install.sh && sudo ~/chals/$CHAL_NAME/install.sh" --zone $ZONE
 else
   echo '[*] no install script - skipping'
 fi
+
 echo '[*] starting container'
-gcloud compute ssh root@$INSTANCE_NAME --command "docker pull tsuro/nsjail-ctf && docker run -d --privileged --expose $PORT --publish $PORT:$PORT --name $CHAL_NAME --restart=always -v /chals/$CHAL_NAME:/home/user:ro tsuro/nsjail-ctf /usr/sbin/run_chal.sh $CHAL_NAME $PORT" --zone $ZONE
+gcloud compute ssh $INSTANCE_NAME --command "sudo sh -c \"docker pull tsuro/nsjail-ctf && docker run -d --privileged --expose $PORT --publish $PORT:$PORT --name $CHAL_NAME --restart=always -v /chals/$CHAL_NAME:/home/user:ro tsuro/nsjail-ctf /usr/sbin/run_chal.sh $CHAL_NAME $PORT\"" --zone $ZONE
+
 echo '[*] adding instance tag'
 gcloud compute instances add-tags $INSTANCE_NAME --tags $CHAL_NAME --zone $ZONE
+
 echo '[*] adding firewall rule'
 FIREWALL_MSG=$(gcloud compute firewall-rules create $CHAL_NAME --allow tcp:$PORT --target-tags $CHAL_NAME 2>&1)
 FIREWALL_RET=$?
